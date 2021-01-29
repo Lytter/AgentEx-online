@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%=gameName%></title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+</head>
+
+<style>
+    div.normal {
+        width: 100%;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    div.last {
+        width: 100%;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    div.img {
+        max-width: 10%;
+        width: auto \9;
+    }
+
+    div.hidden {
+        display: none
+    }
+
+    th {
+        font-size: large;
+        padding: 25px;
+    }
+
+    #wgtmsr {
+        width: 50px;
+    }
+
+    #wgtmsr option {
+        width: 50px;
+    }
+
+    select {
+        font-family: 'FontAwesome'
+    }
+
+    body {
+        padding-top: 60px;
+        padding-bottom: 30px;
+    }
+
+    .centered {
+        text-align: center;
+    }
+
+    .tooltip {
+        position: absolute;
+        background-color: #eeeefe;
+        border: 1px solid #aaaaca;
+        font-size: smaller;
+        padding: 4px;
+        width: 160px;
+        box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        -moz-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        display: table;
+        width: 100%;
+    }
+
+
+</style>
+
+
+
+<nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
+    <a class="navbar-brand" href="#">
+        <% if (gameHasEnded == 'YES') { %>
+        Game has ended
+        <% } else { %>
+        Turn <%=turn%>
+        <% } %>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+            <ul class="navbar-nav">
+                <li class="nav_item" onclick="showTest(this.id)" id="showOverview"><a class="nav-link" href="#"><i
+                        class="fas fa-home"></i> Overview</a></li>
+                <li class="nav_item" onclick="showTest(this.id)" id="showCommunicate"><a class="nav-link" href="#"><i
+                        class="far fa-comment-dots"></i> Communicate</a></li>
+            </ul>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+
+    <% if (gameHasEnded != 'YES') { %>
+    <div class="alert alert-danger collapse" role="alert" id="warning">
+        This game turn has ended! <br><br>
+        You can always go back to the messenger conversation and scroll down to the current turn.
+    </div>
+    <% } %>
+
+    <div class="normal" id="communicate" style="display: none">
+
+        <div class="card" id="You">
+            <div class="card-header bg-primary text-white">
+                <H7><i class="fas fa-user" style="padding-right: 5px"></i>Communicate your perception</H7>
+            </div>
+            <div class="card-body">
+                <p class="card-title">
+                <table style="width: 100%">
+                    <tbody>
+                    <tr>
+                        <th style="size: 100px">Optimal pool size:</th>
+                        <td style="width: 70px"><input style="font-size: 17px" id="chatText" type="number"
+                                                       class="form-control"
+                                                       placeholder="size" max="50" min="5"
+                                                       aria-label="Message"
+                                                       aria-describedby="basic-addon1"></td>
+                        <td style="padding-left: 5px">
+                            <button type="button" name="chatBtn" id="chatBtn" class="btn btn-primary"
+                                    onclick="sendMessage()" disabled>
+                                <i class="far fa-comment-dots"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                </p>
+            </div>
+        </div>
+
+        <div class="card" id="User_1">
+            <div class="card-header bg-info text-white">
+                <table>
+                    <tr>
+                        <td><i class="fas fa-user" style="padding-right: 5px"></i></td>
+                        <td>
+                            <H7>Other users communicated perception on optimal pool size</H7>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="card-body">
+                <p class="card-title">
+                <table style=>
+                    <tbody>
+                    <tr>
+                        <td class="td_1 centered"><b>User 1</b></td>
+                        <td class="td_2 centered"><b>User 2</b></td>
+                        <td class="td_3 centered"><b>User 3</b></td>
+                        <td class="td_4 centered"><b>User 4</b></td>
+                    </tr>
+                    <tr>
+                        <td class="td_1" align="center" id="User_1_amount"><span style="font-size: large"
+                                                                                 class="badge bg-info"
+                        > <i class="fas fa-user-secret"></i> </span></td>
+                        <td class="td_2" align="center" id="User_2_amount"><span style="font-size: large"
+                                                                                 class="badge bg-info"
+                        > <i class="fas fa-user-secret"></i> </span></td>
+                        <td class="td_3" align="center" id="User_3_amount"><span style="font-size: large"
+                                                                                 class="badge bg-info"
+                        > <i class="fas fa-user-secret"></i> </span></td>
+                        <td class="td_4" align="center" id="User_4_amount"><span style="font-size: large"
+                                                                                 class="badge bg-info"
+                        > <i class="fas fa-user-secret"></i> </span></td>
+                    </tr>
+                    </tbody>
+                </table>
+                </p>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="normal" id="withdraw">
+
+        <div id="_test" class="carousel slide">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div id="confidence_div">
+                        <div class="card-header bg-warning">
+                            <H5><i class="fas fa-poll" style="padding-right: 10px"></i>Knowledge confidence</H5>
+                        </div>
+                        <div class="card-body">
+                            After you have read the instructions below
+                            and reviewed the current stock size, assess your confidence in your knowledge of the resource
+                            dynamics.
+                            <table class="table">
+                                <tbody>
+                                <tr>
+                                    <th>
+                                        Current size:
+                                    </th>
+                                    <th scope="row" class="centered" style="width: 100%"><span style="font-size: large"
+                                                                                               class="badge badge-success"><%= Math.ceil(currentAmount) %></span>
+                                    </th>
+                                    <th><a data-toggle="tooltip"
+                                           title="This is the current size of your common pool (After last rounds of withdrawals and replenishments)">
+                                        <i class="fas fa-question-circle"></i>
+                                    </a>
+                                    </th>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <table class="table">
+                                <tbody>
+                                <tr>
+                                    <th scope="row" class="centered" style="width: 100%">
+                                        <div style="text-align: center">
+                                            <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
+                                                  rel="stylesheet"/>
+                                            <form action="/gameStatusRegisterConfidence" method="get" , name="confidenceForm">
+                                                <input type="hidden" name="senderId" value=<%=senderId%>>
+                                                <input type="hidden" name="assessment" id="assessment" value="-1.0">
+                                                <select id="confidenceSelect" class="form-control">
+                                                    <option value="-1.0" selected disabled>Make a selection...</option>
+                                                    <option value="1.0">I fully understand</option>
+                                                    //100%
+                                                    <option value="0.5">I somewhat understand</option>
+                                                    //50%
+                                                    <option value="0.2">I am uncertain</option>
+                                                    //20%
+                                                </select>
+                                            </form>
+                                        </div>
+                                    </th>
+                                    <th><a data-toggle="tooltip"
+                                           title="Assess your understanding of the resource dynamics of the experiment">
+                                        <i class="fas fa-question-circle"></i>
+                                    </a>
+                                    </th>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="last" style="text-align: center">
+
+                            <input type="button" class="btn btn-warning" value="submit assessment" id="assessButton"
+                                   name="assessButton" disabled
+                                   onclick="function makeAssessment() {
+                                           let value = document.getElementById('assessment').value;
+                                           if(value >= 0) {
+                                                $('.carousel').carousel('next');
+                                                knowledgeReported = true;
+                                                socket.emit('Register_Confidence', {assessment: value, senderId: '<%=senderId%>', gameId: '<%=gameId%>'});
+                                            } else {
+                                               bootbox.alert('<b>Make a selection!</b><br><br>'+
+                                               'Please, assess your confidence in your knowledge of the resource dynamics.');
+                                            }
+                                       }
+                                       makeAssessment()">
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item" data-touch="false">
+                    <div id="withdraw_div">
+                        <div class="card-header bg-primary text-white">
+                            <H5><i class="fas fa-layer-group" style="padding-right: 10px"></i>Resource pool size</H5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <tbody>
+                                <tr>
+                                    <th>
+                                        Current size:
+                                    </th>
+                                    <th scope="row" class="centered" style="width: 100%"><span style="font-size: large"
+                                                                                               class="badge badge-success"><%= Math.ceil(currentAmount) %></span>
+                                    </th>
+                                    <th><a data-toggle="tooltip"
+                                           title="This is the current size of your common pool (After last rounds of withdrawals and replenishments)">
+                                        <i class="fas fa-question-circle"></i>
+                                    </a>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Optimal size:
+                                    </th>
+                                    <th scope="row" class="centered" style="width: 100%" id="communicatedOptimalSize">
+                            <span class="badge badge-primary"
+                                  style="font-size: large; color: white">&nbsp;&nbsp;&nbsp;</span>
+                                    </th>
+                                    <th><a data-toggle="tooltip"
+                                           title="This is your latest communicated percieved size of the common pool (After last rounds of withdrawals and before replenishments)">
+                                        <i class="fas fa-question-circle"></i>
+                                    </a>
+                                    </th>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        <div class="<%=gameHasEnded == 'NO' ? 'last' : 'hidden'%>" style="text-align: center">
+                            <form action="/gameStatuspostback" method="get" , name="myForm">
+                                <input type="hidden" name="senderId" id="senderId" value=<%=senderId%>>
+                                <input type="hidden" name="yield" id="yield" value="-1">
+                                <input type="hidden" name="say" id="say" value="">
+                                <input type="button" class="btn btn-primary" value="Make withdrawal" id="yesButton"
+                                       name="yesButton" disabled onClick="function withdrawal() {
+                                           if(!knowledgeReported) {
+                                                            bootbox.alert('<b>Assess your confidence!</b><br><br>'+
+                                                            'Please, assess your confidence in your knowledge of the resource dynamics before you end your turn.', function() {
+                                                               $('.carousel').carousel(0);
+                                                            });
+                                                        }
+                                            else
+                                           makeWithdrawal(function (amount) {
+                                                    if(amount != null)
+                                                        if (isNaN(amount) || amount == '' || amount > Math.ceil('<%=currentAmount%>') || amount < 0)
+                                                            bootbox.alert('<b>Bad input</b><br><br>Your withdrawn amount must be between 0 and ' + Math.ceil('<%=currentAmount%>'));
+                                                        else {
+                                                            document.getElementById('yield').value = amount;
+                                                            let value = {
+                                                                senderId: document.getElementById('senderId').value,
+                                                                yield: document.getElementById('yield').value,
+                                                            };
+                                                            socket.emit('Register_Yield', value);
+                                                            setTimeout(function () {
+                                                                MessengerExtensions.requestCloseBrowser(function success() {
+                                                                    ;
+                                                                }, function error(err) {
+                                                                    alert(err);
+                                                                });
+                                                            }, 200);
+                                                        }
+                                                });
+                                            }
+                                            withdrawal()">
+                            </form>
+
+                        </div>
+
+                        <div class="<%=gameHasEnded == 'YES' ? 'last' : 'hidden'%>" style="text-align: center">
+                            <hr>
+                            <h4>Game has finished!</h4>
+                            Thank you for your participation. <br><br>
+                            <input type="button" class="btn btn-primary" value="End game" id="okButton" name="yesButton"
+                                   onclick=endGame()>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-header bg-info">
+                <a data-toggle="collapse" href="#collapse1" style="color:white">
+                    <H5><i class="fas fa-chalkboard-teacher" style="padding-right: 10px"></i>Basic instructions
+                    </H5>
+                </a>
+            </div>
+            <div id="collapse1"
+                 class="card-collapse collapse <%=gameHasEnded == 'YES' || turn != 1 ? '' : 'in'%>">
+                <div class="card-body">
+                    <div>
+                        In this game you act as a fictive resource user. Together with the other experiment
+                        participants you form a group. You and your group members have common access to a
+                        resource
+                        stock. Each of you can harvest units of this resource. Your object is to sustainably
+                        harvest
+                        as
+                        much
+                        resources as possible.
+                    </div>
+                    <br>
+                    <div>
+                        The experiment lasts several rounds and in each round you take an individual decision of
+                        how
+                        many units of the resource you would like to harvest. The resource regenerates itself
+                        before
+                        each new round. The regeneration depends on how much of the resource stock is left from
+                        the
+                        previous round, which in turn depends on the total harvest of the previous round (sum of
+                        your
+                        and the other participants’ harvest in the previous round). As long as there are units
+                        to
+                        harvest, the experiment continues for a number of rounds. The more rounds you succeed to
+                        sustain
+                        the resource the more you are able to harvest, and respectively earn, in total. The
+                        exact
+                        number
+                        of rounds is unknown to you. If the group’s total harvest is equal to or exceeding the
+                        number of
+                        available resource units in one round, the resource regeneration is zero and the
+                        experiment
+                        ends. The harvest you receive in that round is then based on your percentage of the
+                        group’s
+                        total harvest in that round.
+                    </div>
+                    <br>
+                    <div>
+                        The exact relation between the size of the resource stock and its regeneration is
+                        illustrated in
+                        the next section below
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <a data-toggle="collapse" href="#collapse2" style="color:white">
+                    <H5><i class="fas fa-plus" style="padding-right: 10px"></i>Resource dynamics</H5>
+                </a>
+            </div>
+            <div id="collapse2"
+                 class="card-collapse collapse <%=gameHasEnded == 'YES' || turn != 1 ? '' : 'in'%>">
+                <div class="card-body">
+                    <div>
+                        There are 50 units of the resource in the beginning of the experiment. If you, for
+                        example,
+                        harvest
+                        together 17 units in the first round, the resource will regenerate itself by 7 units
+                        and,
+                        hence,
+                        the
+                        resource stock will consist of (50-17+7) = 40 units in round 2.
+                    </div>
+                    <br>
+                    <div>
+                        <b>A graphical illustration of the resource dynamics.</b>
+                        <img
+                                src="/img/ResourceRegenerationModel.jpg"
+                                alt="Explanatory graph of resource replenishment"
+                                height="100%"
+                                width="100%"/>
+                    </div>
+                    <br>
+                    <div>
+                        <b>Regeneration for each stock resource stock size.</b>
+                        <img
+                                src="/img/ResourceTable.jpg"
+                                alt="Explanatory table of resource replenishment"
+                                height="100%"
+                                width="100%"/>
+                    </div>
+                    <br>
+
+                    <div>
+                        You take a decision about how many units (in whole numbers, between 0 and current
+                        resource
+                        stock
+                        size) you would like to harvest in each round. The individual decisions are communicated
+                        via
+                        protocol and are anonymous. However, if you chose to do so you can communicate your
+                        perception
+                        of what size would be optimal for the resource stock. The computer calculates
+                        the total harvest in each round, lowers the resource stock by this amount, calculates
+                        how
+                        many
+                        resource units regenerate and discloses the new size of the resource stock to you.
+                    </div>
+                    <br>
+                    <div>
+                        After the very last round, you are requested to fill in a short questionnaire.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <a data-toggle="collapse" href="#collapse3" style="color:white">
+                    <H5><i class="fas fa-archive" style="padding-right: 10px"></i>Instruction summary</H5>
+                </a>
+            </div>
+            <div id="collapse3"
+                 class="card-collapse collapse <%=gameHasEnded == 'YES' || turn != 1 ? '' : 'in'%>">
+                <div class="card-body">
+                    <ul>
+                        <li>
+                            You and the other participants in your group share one resource stock.
+                        </li>
+                        <li>
+                            In each round you will take an individual decision of how many units of the resource
+                            you
+                            would like to
+                            harvest.
+                        </li>
+                        <li>
+                            As long as the stock size of the resource is between 5 and 49, it regenerates itself
+                            every
+                            round.
+                        </li>
+                        <li>
+                            Since it is a common resource, the regeneration is dependent on the size of the
+                            resource
+                            stock and the total
+                            harvest. The exact relation is illustrated in Figure 1 and Table 1.
+                        </li>
+                        <li>
+                            As long as the resource regenerates itself the experiment continues, while the exact
+                            number
+                            of rounds is
+                            unknown to you.
+                        </li>
+                        <li>
+                            Try to maximize your harvest.
+                        </li>
+                    </ul>
+                    <br>
+                    <div>
+                        Good luck, have fun!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+
+<script
+        src="https://code.jquery.com/jquery-3.4.0.js"
+        integrity="sha256-DYZMCC8HTC+QDr5QNaIcfR7VSPtcISykd+6eSmBW5qo="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/js/bootstrap-select.min.js"></script>
+
+
+<!-- bootbox code -->
+<script src="js/bootbox.min.js"></script>
+<script src="js/bootbox.locales.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
+<script src="socket.io/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
+<script>
+
+    var gameObject;
+    var knowledgeReported = false;
+
+    function showAlert(type, message) {
+        if (type == "warning") {
+            $('#alert').html("<div class='alert alert-danger'> <strong>Warning!</strong> " + message + "</div>");
+            $('#alert').show();
+        }
+        if (type == "info") {
+            $('#alert').hide();
+        }
+    }
+
+    console.log("ajax")
+    $.ajax({
+        url: '/getGame',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/x-www-form-urlencoded',
+        data: {
+            gameId: "<%=gameId%>"
+        },
+        success: function (data, textStatus, jQxhr) {
+            gameObject = data.game;
+            console.log(gameObject)
+            if (gameObject) {
+                let array = gameObject.gameTurns[parseInt("<%=turn%>") - 1].conficenceInOptimalStockSize;
+                let confidenceAlreadyReported = false;
+                for (let i = 0; i < array.length; i++) {
+                    if (array[i].playerid == "<%=senderId%>")
+                        confidenceAlreadyReported = true;
+                }
+                if (confidenceAlreadyReported) {
+                    console.log("CYCLE")
+                    $('.carousel').carousel('next');
+                    knowledgeReported = true;
+                }
+                addDataToTable(gameObject);
+                if ("<%=turn%>" != ("" + (gameObject.currentTurnIndex + 1))) {
+                    $('#warning').show()
+                } else if (hasAlreadySubmittedYield())
+                    $('#warning').show()
+                else {
+                    $('#yesButton').removeAttr('disabled');
+                    $('#chatBtn').removeAttr('disabled');
+                    $('#assessButton').removeAttr('disabled');
+                    if (gameObject.players[getPlayerIdFromPosition("<%=senderId%>") - 1].optimalStockSize > 0) {
+                        $("#communicatedOptimalSize").html('<span class="badge badge-primary" style="font-size: large">' + gameObject.players[getPlayerIdFromPosition("<%=senderId%>") - 1].optimalStockSize + '</span>')
+                        $("#chatText").val(gameObject.players[getPlayerIdFromPosition("<%=senderId%>") - 1].optimalStockSize);
+                    } else
+                        $("#communicatedOptimalSize").html('<span class="badge badge-primary" style="font-size: large"><i class="fas fa-question-circle"></i></span>')
+                }
+            } else {
+                console.log("NEXT")
+                $('.carousel').carousel('next');
+            }
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            console.log("Game is not alive")
+            $('#warning').show()
+            console.log("CYCLEaa")
+            $('.carousel').carousel('next');
+        }
+    });
+
+    $('.navbar-nav>li>a').on('click', function () {
+        $('.navbar-collapse').collapse('hide');
+    });
+    //Connecting To socket.io
+    console.log(window.location.host)
+    const socket = io.connect(window.location.host);
+    socket.on("Server_Chat_Message", function (data) {
+
+        //OBS! DEN SOM SKICKAR MEDDELANDET FÅR INTE NOTIFIERINGEN
+        //LÄGG IN MEDDELANDET SJÄLV I BEFINTLIGT GAME.
+
+
+        console.log("MESSAGE RECIEVED IN HTML");
+        console.log(data);
+        if (data.game.id === "<%=gameId%>") {
+            gameObject = data.game;
+            addDataToTable(data.game);
+        }
+    });
+
+    function sendMessage() {
+        if (!gameObject || "<%=turn%>" != ("" + (gameObject.currentTurnIndex + 1)) || hasAlreadySubmittedYield()) {
+            let message;
+            if ("<%=gameHasEnded%>" == 'YES')
+                message = "<b>This game has ended!</b><br> You can still review the data, but you cannot interact with the game. <br><br>";
+            else
+                message = "<b>This game turn has ended!</b> " +
+                    "<br> You can still review the data, but you cannot interact with the game. <br><br>" +
+                    "You can always go back to the messenger conversation and scroll down to the current turn.";
+            bootbox.alert(message);
+            return;
+        }
+
+        document.getElementById("chatBtn").focus();
+        let text = document.getElementById("chatText");
+        if (gameObject.players[getPlayerIdFromPosition("<%=senderId%>") - 1].optimalStockSize != text.value) {
+            if (text.value === "" || isNaN(text.value) || parseInt(text.value) > 50 || parseInt(text.value) < 5)
+                bootbox.alert("<b>Bad input</b><br><br>Your percieved optimal size of the resource stock must be an integer between 5 and 50");
+            else
+            {
+                socket.emit("New_Chat_Message", {
+                    message: text.value,
+                    senderId: "<%=senderId%>",
+                    gameId: "<%=gameId%>"
+                });
+                addRow("table", "<%=turn%>", "<%=senderId%>", text.value);
+            }
+        }
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+            return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "//connect.facebook.com/en_US/messenger.Extensions.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'Messenger'));
+
+    function makeWithdrawal(callback) {
+        if (!gameObject || "<%=turn%>" != ("" + (gameObject.currentTurnIndex + 1)) || hasAlreadySubmittedYield()) {
+            let message;
+            if ("<%=gameHasEnded%>" == 'YES')
+                message = "<b>This game has ended!</b><br> You can still review the data, but you cannot interact with the game. <br><br>";
+            else
+                message = "<b>This game turn has ended!</b> " +
+                    "<br> You can still review the data, but you cannot interact with the game. <br><br>" +
+                    "You can always go back to the messenger conversation and scroll down to the current turn.";
+            bootbox.alert(message);
+            return;
+        }
+
+        //borde vara det man angav i senaste rundan
+        //var amount = prompt("Please enter the amount of resources that you want to withdraw.", "5");
+        bootbox.prompt({
+            title: "Please enter the amount of resources that you want to withdraw.",
+            inputType: 'number',
+            callback: callback
+        });
+    }
+
+
+    function endGame() {
+        console.log("closing");
+        MessengerExtensions.requestCloseBrowser(function success() {
+        }, function error(err) {
+            alert(err);
+        });
+    }
+
+
+    function showTest(id) {
+        if (id == "showCommunicate") {
+            let div = document.getElementById("communicate");
+            div.style.display = "block";
+            let div_ = document.getElementById("withdraw");
+            div_.style.display = "none";
+        } else {
+            let div = document.getElementById("communicate");
+            div.style.display = "none";
+            let div_ = document.getElementById("withdraw");
+            div_.style.display = "block";
+        }
+    }
+
+    function addRow(tableID, turn, sender, message) {
+        gameObject.gameTurns[gameObject.currentTurnIndex].communications.push({
+            id: turn,
+            playerid: "You",
+            message: message
+        });
+        gameObject.players[parseInt(getPlayerIndexFromId(sender), 10)].optimalStockSize = message;
+        addDataToTable(gameObject);
+    }
+
+    $(document).ready(function () {
+        $('.carousel').carousel({
+            interval: false
+        });
+        $('a[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'bottom',
+            trigger: 'click'
+        });
+        $('#chatText').keypress(function (e) {
+            if (e.keyCode == 13)
+                $('#chatBtn').click();
+        });
+        $('#confidenceSelect').on('change', function (t) {
+            let value = $(this).children("option:selected").val()
+            console.log(value);
+            document.getElementById('assessment').value = value;
+        });
+    });
+
+    function hasAlreadySubmittedYield() {
+        for (let i = 0; i < gameObject.gameTurns[gameObject.currentTurnIndex].yields.length; i++) {
+            let y = gameObject.gameTurns[gameObject.currentTurnIndex].yields[i]
+            if (("" + y.playerid) == ("" + "<%=senderId%>"))
+                return true;
+        }
+        return false;
+    }
+
+    function addDataToTable(data) {
+        console.log("ADDING DATA");
+        console.log(data);
+        let index = getPlayerIdFromPosition("<%=senderId%>")
+        $(".td_" + index).hide()
+        console.log("index: " + index)
+        let communications = data.gameTurns[parseInt("<%=turn%>") - 1].communications;
+        console.log(communications);
+        for (let j = 0; j < communications.length; j++) {
+            let row = communications[j];
+            row.playerid = getPlayerIdFromPosition(row.playerid);
+            if (("" + row.playerid) == (index)) {
+                row.playerid = "You";
+            }
+            console.log("PlayerId: " + row.playerid)
+            switch (row.playerid) {
+                case "You": {
+                    $("#chatText").val(row.message);
+                    $("#communicatedOptimalSize").html('<span class="badge badge-primary" style="font-size: large">' + row.message + '</span>');
+                    console.log("Update: you " + row.message);
+                    break;
+                }
+                case 1: {
+                    $("#User_1_amount").html('<span style="font-size: large" class="badge bg-info">' + fixOverflow(Math.ceil(row.message)) + '</span>');
+                    $('#User_1').show();
+                    console.log("Update: 1 " + row.message);
+                    break;
+                }
+                case 2: {
+                    $("#User_2_amount").html('<span style="font-size: large" class="badge bg-info">' + fixOverflow(Math.ceil(row.message)) + '</span>');
+                    $('#User_2').show();
+                    console.log("Update: 2 " + row.message);
+                    break;
+                }
+                case 3: {
+                    $("#User_3_amount").html('<span style="font-size: large" class="badge bg-info">' + fixOverflow(Math.ceil(row.message)) + '</span>');
+                    $('#User_3').show();
+                    console.log("Update: 3 " + row.message);
+                    break;
+                }
+                case 4: {
+                    $("#User_4_amount").html('<span style="font-size: large" class="badge bg-info">' + fixOverflow(Math.ceil(row.message)) + '</span>');
+                    $('#User_4').show();
+                    console.log("Update: 4 " + row.message);
+                }
+            }
+        }
+    }
+
+    function fixOverflow(communicatedNumber) {
+        if (communicatedNumber > 50)
+            return 50;
+        if (communicatedNumber < 5)
+            return 5;
+        return communicatedNumber;
+    }
+
+    function getPlayerIdFromPosition(sender) {
+        for (let i = 0; i < gameObject.players.length; i++) {
+            if (gameObject.players[i].id == sender) {
+                return i + 1;
+            }
+        }
+        return "<%=senderId%>";
+    }
+
+    function getPlayerIndexFromId(userId) {
+        for (let i = 0; i < gameObject.players.length; i++) {
+            if (gameObject.players[i].id == userId)
+                return i;
+        }
+    }
+
+    function loadData(dataArray) {
+
+        $('#table').bootstrapTable({
+            data: dataArray
+        });
+        $('#table').bootstrapTable('load', dataArray);
+
+    }
+
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Consent</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+
+<!-- JS dependencies -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+<script src="socket.io/socket.io.js"></script>
+
+
+<!-- bootbox code -->
+<script src="js/bootbox.min.js"></script>
+<script src="js/bootbox.locales.min.js"></script>
+<script>
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+            return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "//connect.facebook.com/en_US/messenger.Extensions.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'Messenger'));
+
+    function create(senderId) {
+        if (senderId != '2179476705443686')
+            alert('Sorry, no go.');
+        else {
+            document.myForm.submit();
+        }
+
+    }
+
+    const socket = io.connect(window.location.host);
+
+
+</script>
+<style>
+    div.normal {
+        width: 100%;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    div.last {
+        width: 100%;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    div.img {
+        max-width: 10%;
+        width: auto \9;
+    }
+
+    div.loading {
+        position: fixed;
+        z-index: 999;
+        height: 2em;
+        width: 2em;
+        overflow: visible;
+        margin: auto;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+    }
+
+    td {
+        padding: 15px;
+    }
+</style>
+
+
+<div>
+    <img
+            src="/img/banner.jpg"
+            alt="triangle with all three sides equal"
+            height="30px"
+            width="100%"/>
+</div>
+
+
+<div class="normal">
+
+    <H4>Admin, only for Andreas Lytter</H4>
+    <div>If you are not me, you are trespassing! Please leave.
+        <img
+                src="/img/icons8-crown-100.png"
+                alt="Admin form"
+                style="padding: 0 5px;
+                    float: right;"/>
+        If you have landed on this page by accident, please mail me about it!
+        <A HREF="mailto:anly9937@student.su.se">anly9937@student.su.se</A>.
+    </div>
+    <br>
+    <form method="get" name="myForm">
+        <input type="hidden" name="senderId" id="senderId" value=<%=senderId%>>
+        Create a new group with id:
+        <input type="text" name="group" id="group" value="123456">
+        <br>Java server running at:
+        <br><input type="text" name="java_server" id="java_server" value="55c9bcdc.ngrok.io">
+        <br>Path to result report:
+        <br><input type="text" name="path_to_result" id="path_to_result"
+                   value="C:\Users\andlyt1ros\Documents\Master\views\games">
+        <br>NetLogo model:
+        <br><input type="text" name="netlogo_model" id="netlogo_model"
+                   value="C:\Users\andlyt1ros\Desktop\AgentExV1.1.nlogo">
+        <br>NetLogo world:
+        <br><input type="text" name="netlogo_model" id="netlogo_world"
+                   value="C:\Users\andlyt1ros\Desktop\NetLogo_Experiments\Experiment_1_world.csv">
+        <br>Post-game survey:
+        <br><input type="text" name="survey" id="survey" value="https://forms.gle/tasvubiuDeQAh3h37">
+        <br>Availiable until:
+        <br><input type="date" name="valid_until" id="valid_until" value="2019-05-20">
+        <br>Max human players:
+        <br><input type="number" name="max_humans" id="max_humans" value="2">
+        <br>Grace period for game sign up (ms):
+        <br><input type="number" name="grace" id="grace" value="4000">
+
+
+        <hr>
+        <div class="normal" style="text-align: center">
+            <div><b>Lets go.</b>
+            </div>
+
+            <div class="last">
+                <input type="button" class="btn btn-danger" value="Cancel" id="noButton" name="noButton"
+                       onclick=cancel()>
+                <input type="button" class="btn btn-primary" value="Create a new group" id="yesButton" name="yesButton"
+                       onClick="function makeNewGroup() {
+                    let value = {
+                        senderId: document.getElementById('senderId').value,
+                        groupname: document.getElementById('group').value,
+                        java_server: document.getElementById('java_server').value,
+                        path_to_result: document.getElementById('path_to_result').value,
+                        netlogo_model: document.getElementById('netlogo_model').value,
+                        netlogo_world: document.getElementById('netlogo_world').value,
+                        survey: document.getElementById('survey').value,
+                        valid_until: document.getElementById('valid_until').value,
+                        max_humans: document.getElementById('max_humans').value,
+                        grace: document.getElementById('grace').value
+                    }
+
+                    console.log(value);
+
+                    socket.emit('Register_New_Group', value);
+
+                    setTimeout(function () {
+                        MessengerExtensions.requestCloseBrowser(function success() {
+                            ;
+                        }, function error(err) {
+                            alert(err);
+                        });
+                    }, 200);
+
+                }
+                makeNewGroup()">
+            </div>
+        </div>
+    </form>
+</div>
+
+
+</body>
+</html>

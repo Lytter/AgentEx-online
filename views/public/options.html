@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Consent</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<body>
+<style>
+    div.normal {
+        width: 100%;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    div.last {
+        width: 100%;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    div.img {
+        max-width: 10%;
+        width: auto \9;
+    }
+
+    div.loading {
+        position: fixed;
+        z-index: 999;
+        height: 2em;
+        width: 2em;
+        overflow: visible;
+        margin: auto;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+    }
+
+    td {
+        padding: 15px;
+    }
+    input.largerCheckbox {
+        width: 40px;
+        height: 40px;
+    }
+</style>
+
+
+<div>
+    <img
+            src="/img/banner.jpg"
+            alt="triangle with all three sides equal"
+            height="30px"
+            width="100%"/>
+</div>
+
+
+<div class="normal">
+
+    <H4>Informed consent</H4>
+    <div>You are invited to participate in a research project
+        <img
+                src="/img/icons8-contract-100.png"
+                alt="Consent form"
+                style="padding: 0 5px;
+                    float: right;"/>
+
+        aiming to
+        digitally implement an existing Common-Resource Pool Game (CPR), and extend the underlying Agent Based Model
+        (ABM),
+        so that humans can collaborate with scripted agents.
+    </div>
+    <br>
+    <div>Participators in the study will, through playing an online version of the CPR against three ABMs, help to
+        evaluate
+        the developed software artifact.
+        Through participation in this study you will assist in the development of a new software to facilitate future
+        research efforts
+        about mechanisms of social learning, shared management strategies and the relationship between social and
+        ecological uncertainty.
+        After this study has concluded, the new software will be available to facilitate furure research efforts.
+    </div>
+    <br>
+    <div>The online CPR will take about 10 to 15 minutes to complete.
+        Participation in this survey requires a Facebook account and a login on the Messenger platform.
+        No personal information is stored in this study. However, all activity will be
+        completly visible on the Facebook platform, and might be stored by Facebook and/or Messenger.
+    </div>
+    <br>
+    <div>Participation is completely voluntary. At any time you can choose to exit the conversation in Messenger,
+        and not complete the CPR.
+        Please note that you must be at least 18 years old to participate in this study.
+    </div>
+    <br>
+    <div>By clicking on the "I agree"-button below you leave your informed consent to participate in the study.
+    </div>
+    <br>
+    <div>
+        For questions about the research project, please contact Andreas Lytter (student at Stockholm University),
+        <A HREF="mailto:anly9937@student.su.se">anly9937@student.su.se</A>.
+        Please save a copy of this text for future reference.
+        <br>Regards. Andreas Lytter
+    </div>
+
+</div>
+<form method="get" , name="myForm" id="myForm">
+    <input type="hidden" name="senderId" id="senderId" value=<%=senderId%>>
+    <input type="hidden" name="answer" id="answer" value="No">
+    <input type="hidden" name="password" id="password" value="1">
+
+    <hr>
+    <div class="normal" style="text-align: center">
+        <table>
+            <tr>
+                <th>
+                    I have read the above information and agree to participate in this research project
+                </th>
+                <td>
+                    <input type="checkbox" class="largerCheckbox" id="IdoAgree" onclick="handleAgreement()">
+                </td>
+            </tr>
+        </table>
+
+
+        <div class="last">
+            <input type="button" class="btn btn-primary" value="Submit consent" id="yesButton" name="yesButton"
+                   onClick="function makeConsent() {
+                if (document.getElementById('answer').value == 'Yes')
+                    agree(function (result) {
+                        if (result) {
+                            document.getElementById('password').value = result;
+                            let value = {
+                                senderId: document.getElementById('senderId').value,
+                                password: document.getElementById('password').value,
+                                answer: document.getElementById('answer').value,
+                            };
+
+                            socket.emit('Register_Consent', value);
+
+                            setTimeout(function () {
+                                MessengerExtensions.requestCloseBrowser(function success() {
+                                    ;
+                                }, function error(err) {
+                                    alert(err);
+                                });
+                            }, 200);
+                        }
+                    });
+                }
+                makeConsent()">
+        </div>
+    </div>
+</form>
+
+<script
+        src="https://code.jquery.com/jquery-3.4.0.js"
+        integrity="sha256-DYZMCC8HTC+QDr5QNaIcfR7VSPtcISykd+6eSmBW5qo="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+
+<!-- bootbox code -->
+<script src="js/bootbox.min.js"></script>
+<script src="js/bootbox.locales.min.js"></script>
+<script src="socket.io/socket.io.js"></script>
+<script>
+
+    const socket = io.connect(window.location.host);
+
+    function handleAgreement() {
+        let checkBox = document.getElementById("IdoAgree");
+        if (checkBox.checked == true) {
+            document.getElementById("answer").value = "Yes";
+        } else {
+            document.getElementById("answer").value = "No";
+        }
+    }
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+            return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "//connect.facebook.com/en_US/messenger.Extensions.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'Messenger'));
+
+    function agree(callback) {
+
+        bootbox.prompt({
+            title: "Please enter the secret code for the study",
+            inputType: 'text',
+            value: '123456',
+            callback: callback
+        });
+    }
+
+    function reject() {
+        document.myForm.submit();
+    }
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+TODO
+
+Fixat   Det verkar som att JavaServern inte tar emot fler spel än 10, trots att reset har anropats.
+
+Onsdag
+
+Kolla hur vi skulle kunna kommunicera om en optimal fördelning.
+1. Ny vy som man kommer till från game screen
+2. visa som en chat.
+3. ta emot och skicka meddelanden.
+4. Skapa en bot för kommunikation.
+
+Kontrollera så att modellen gör rätt när jag anger min nivå
+
+hantera att poolen tar slut
+
+kontroller vad återflnnands nivån är på och uppdatera gui
+
+Tillåt uttag i decimaler!
+
+
+Fixat   Fixa texter till
+        1. consent
+        2. Instruktion, kolla deras tidigare rapport.
+
+        StartUp ange först 8080-servern, därefter 3000-servern
+        regga på developer. facebook
+        regga safe domain
+
+
